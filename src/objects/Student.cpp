@@ -22,21 +22,21 @@ int Student::sciper(){
 }
 
 bool Student::addExam(Date date,Time time, Examen* ptrExa){
-    return a_mapExam[date].addFixe(time, ptrExa);
+	return a_timeTable.addOnDateAndTime(ptrExa, date, time);
 }
 
 void Student::addExam(Date date, Examen* ptr){
-    a_mapExam[date].addNonFixe(ptr);
+    a_timeTable.addOnDate(ptr, date);
 }
 
 bool Student::fixeExam(Date date,Time time, Examen* ptrExa, int minDist){
-    return a_mapExam[date].placeNonFixeLoin(ptrExa, time,minDist);//On veut le placer a plus de deux heures d'un autre exa
+    return a_timeTable[date]->placeNonFixeLoin(ptrExa, time,minDist);//On veut le placer a plus de deux heures d'un autre exa
 }
 
 vector<int> Student::nbrExamenDate(vector<Date> listDate){
     vector<int> retour;
     for (int i(0); i<listDate.size(); i++) {
-        retour.push_back(a_mapExam[listDate[i]].nombreElement());
+        retour.push_back(a_timeTable.numberObjectsOnDate(listDate[i]));
     }
     return retour;
 }
@@ -44,8 +44,8 @@ vector<int> Student::nbrExamenDate(vector<Date> listDate){
 int Student::calculerScore(){
     //On calcule la distance entre les dates. si une date a plusieurs objets on récupère les crénaux horaires et on les note
     int score(0);
-    Date precedant(a_mapExam.begin()->first);//La date est la première
-    for (auto it(a_mapExam.begin()); it!= a_mapExam.end(); it++) {
+    Date precedant(a_timeTable.begin()->first);//La date est la première
+    for (auto it(a_timeTable.begin()); it!= a_timeTable.end(); it++) {
         //On calcule le nombre de jours depuis le precedant
         int distanceJours(Date::distance(precedant, it->first));
         if (distanceJours<3) {//Si il y a plus de trois jours le score deviens stable
@@ -59,14 +59,14 @@ int Student::calculerScore(){
         
         //Maintenant on vérifie qu'il n'y aie pas trop d'exas le même jour
         
-        int nombreExamen(it->second.nombreElement());
+        int nombreExamen(it->second->nombreElement());
         if (nombreExamen>2) {
             score-=10000;//On tue le score si il y a plus de deux exas, Ca ne devrait pas arriver
         }
         else if (nombreExamen==2){
             score-=1000;
             //Si on a deux exas, il nous faut les heures
-            vector<Time> heures(it->second.getTime());
+            vector<Time> heures(it->second->getTime());
             if (heures.size()==2) {
                 int distanceHeure (Time::distance(heures[0], heures[1]));
                 //Si la distance est moins que deux heures, l'étudiant ne pourra pas aller a son autre exa
@@ -106,8 +106,8 @@ Student* Student::newStudent(){
 void Student::afficher(ofstream& fSave){
     fSave<<a_name<<endl;
     fSave<<a_email<<endl<<endl;
-    for (auto it(a_mapExam.begin()); it!=a_mapExam.end(); it++) {
+    for (auto it(a_timeTable.begin()); it!=a_timeTable.end(); it++) {
         fSave<<endl<<"\t  "<<it->first<<endl<<endl;
-        fSave<<(it->second);//Pas de endl car déjà a la fin de chaque nom
+        fSave<<*(it->second);//Pas de endl car déjà a la fin de chaque nom
     }
 }

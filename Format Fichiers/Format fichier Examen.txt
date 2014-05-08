@@ -1,0 +1,29 @@
+Examen
+(nom)
+(nom Professeur)
+(Salle)
+(Type format: Ecrit Oral)
+(durée)
+Liste Etudiants[ou]Pas Liste Etudiants
+(nom); (nom); …; (nom)
+[Si écrit:]
+(date format: jj.mm.aaaa)
+(heure format: hh:mm ou HHhMM)
+[Si Oral:(les noms fixés ne sont pas dans la liste d’Etudiant)]
+Liste Horaires
+Nouveau Jour
+(date format: jj.mm.aaaa)
+(heure format: hh:mm ou HHhMM)
+(heure)
+…
+(heure)
+Nouveau Jour
+(date format: jj.mm.aaaa)
+(heure format: hh:mm ou HHhMM)[OU](heure + nom étudiant format: HH:MM NOM ETUDIANT)
+(heure)
+…
+(heure)
+Fin Liste Horaires
+Fin Examen
+Examen
+….

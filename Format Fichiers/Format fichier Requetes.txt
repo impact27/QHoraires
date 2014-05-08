@@ -1,0 +1,7 @@
+Debut Requetes
+(Email étudiant)
+(Nom examen)
+(date format: jj.mm.aaaa)
+(email)
+…
+Fin Requetes

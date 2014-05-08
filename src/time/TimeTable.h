@@ -209,6 +209,9 @@ public:
         }
         return str;
     }
+	DayTimeTable* copyDayTimeTableWithMap(map<T, T> myMap){
+		return new DayTimeTable<T>(*this,myMap);
+	}
     
     
 };
@@ -226,15 +229,44 @@ public:
 		
 		return retour;
 	}
+	int numberObjectsOnDate(Date date){
+		if (!hasDate(date)) {
+			return 0;
+		}
+		return this->at(date)->nombreElement();
+	}
 	
 	void addDate(Date day){
-		(*this)[day]= new DayTimeTable<T>();
+		if (!hasDate(day)) {
+			this->map<Date, DayTimeTable<T>* >::operator[](day)= new DayTimeTable<T>();
+		}
+
 	}
 	bool addOnDateAndTime(T toAdd, Date date, Time time){
+		//SI la date n'existe pas, on la crée
+		addDate(date);
 		return this->at(date)->addFixe(time, toAdd);
 	}
+	bool hasDate(Date date){
+		return this->count(date)==1;
+	}
+	void addOnDate(T toAdd, Date date){
+		//SI la date n'existe pas, on la crée
+		addDate(date);
+		this->at(date)->addNonFixe(toAdd);
+	}
+	
 	unsigned long size(){
 		return map<Date, DayTimeTable<T>* >::size();
+	}
+	~TimeTable(){
+		for (auto it(this->begin()); it!=this->end(); it++) {
+			delete it->second;
+		}
+	}
+	DayTimeTable<T>*& operator[](Date date){
+		addDate(date);
+		return map<Date, DayTimeTable<T>* >::operator[](date);
 	}
 	
 };

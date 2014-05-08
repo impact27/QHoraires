@@ -300,7 +300,7 @@ Oral* Oral::copyOralWithStudentMap(map<Student*,Student*> mapStudent){
     Oral* retour= new Oral(a_name, a_nomProf, a_Room,a_duration, newListARepartir);
     //on remplis la map jour par jour
     for (auto it(a_timeTable.begin()); it!=a_timeTable.end(); it++) {
-        retour->a_timeTable[it->first]=new DayTimeTable<Student*>(*(it->second),mapStudent);
+        retour->a_timeTable[it->first]=it->second->copyDayTimeTableWithMap(mapStudent);
         retour->fixerStudent();
     }
     
@@ -321,10 +321,5 @@ void Oral::fixerStudent(){
             
         }
         
-    }
-}
-Oral::~Oral(){
-    for (auto it(a_timeTable.begin()); it!=a_timeTable.end(); it++) {
-        delete it->second;
     }
 }

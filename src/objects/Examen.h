@@ -71,7 +71,6 @@ public:
     bool repartirCases();//On répartit les étduiants dans des heures aléatoirement
     
     void fixerStudent();
-    ~Oral();
     
 };
 
