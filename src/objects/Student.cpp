@@ -30,7 +30,7 @@ void Student::addExam(Date date, Examen* ptr){
 }
 
 bool Student::fixeExam(Date date,Time time, Examen* ptrExa, int minDist){
-    return a_timeTable[date]->placeNonFixeLoin(ptrExa, time,minDist);//On veut le placer a plus de deux heures d'un autre exa
+	return a_timeTable.addOnDateFarFrom(ptrExa, date, time , minDist);
 }
 
 vector<int> Student::nbrExamenDate(vector<Date> listDate){

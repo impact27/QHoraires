@@ -71,23 +71,22 @@ void Oral::addTime(Date day,Time time,Student* etudiant){// si il y a plus de no
 bool Oral::JourSeul(){
     bool modifie = false;
     //Si il y a un seul jour, on met tout les étudiants dans ce jour
-    if (a_timeTable.size()==1) {
+    if (a_timeTable.numberOfDays()==1) {
         list<Student*>::iterator it=a_listEtudiantARepartir.begin();
         while(it != a_listEtudiantARepartir.end()){
-            
+            Date firstDate = a_timeTable.getDateAtIndex(0);
             //On ajoute a l'horaire
-            a_timeTable.begin()->second->addNonFixe((*it));
-            
-            
+			a_timeTable.addOnDate(*it, firstDate);
+		
             //On dit a l'étudiant de l'ajouter
-            (*it)->addExam(a_timeTable.begin()->first, this);
+            (*it)->addExam(firstDate, this);
             
             it=a_listEtudiantARepartir.erase(it);
             modifie=true;
         }
         
     }
-    else if (a_timeTable.size()>1){
+    else if (a_timeTable.numberOfDays()>1){
         //Si il y a plusieurs jours, on doit demander à chaque personne si elle a déjà des exas les autres jours
         
         //On boucle sur les étudiants au hasard
@@ -111,7 +110,7 @@ bool Oral::JourSeul(){
                 }
             }
             if (nbrZero==1) {
-                a_timeTable.at(selection)->addNonFixe((*it));
+				a_timeTable.addOnDate(*it, selection);
                 (*it)->addExam(selection, this);
                 modifie=true;
             }
@@ -131,25 +130,22 @@ bool Oral::JourSeul(){
 }
 
 vector<Date> Oral::listeDatesLibres(){
-    vector<Date> retour;
-    for (auto it(a_timeTable.begin()); it!=a_timeTable.end(); it++) {
-        if (it->second->FreeSlots()) {//Si il y a des places libres
-            retour.push_back(it->first);
-        }
-    }
-    return retour;
+	return a_timeTable.listeDatesLibres();
 }
 
 string Oral::name() const{
     return a_name;
 }
 bool Oral::requestDate(Student* asker,Date jour){
-    if (IsDateExam(jour)) {//Si le jour est un jour d'examen
-        if (a_timeTable.at(jour)->FreeSlots()) {//Si il y a de la Place
+	
+    if (a_timeTable.hasDate(jour)) {//Si le jour est un jour d'examen
+		
+        if (a_timeTable.hasFreeSlotsOnDate(jour)) {//Si il y a de la Place
             auto it(find(a_listEtudiantARepartir.begin(), a_listEtudiantARepartir.end(), asker));
             if (it!=a_listEtudiantARepartir.end()) {//Si c'est un des étudiant du cours
-                a_timeTable.at(jour)->addNonFixe(asker);
+				a_timeTable.addOnDate(asker, jour);
                 a_listEtudiantARepartir.erase(it);
+				return true;
             }
             else{
 				cout<<"\nL'étudiant "<<asker->name()<< " n'est pas inscrit dans "<< name()<<" ou à fait deux demandes."<<endl;
@@ -157,13 +153,6 @@ bool Oral::requestDate(Student* asker,Date jour){
         }
     }
     return false;
-}
-
-bool Oral::IsDateExam(Date jour){
-    if (a_timeTable.find(jour) == a_timeTable.end()) {
-        return false;
-    }
-    return true;
 }
 
 void Oral::placerReste(){
@@ -195,7 +184,7 @@ void Oral::placerReste(){
             for (int j=0; j<listeNbrExa.size(); j++) {//Sur toute les possibilités
                 if (listeNbrExa[j]==i&&!place) {//On ne refait pas la boucle si on a fini
                     Date selection=listeDate[j];
-                    a_timeTable.at(selection)->addNonFixe((*it));
+					a_timeTable.addOnDate(*it, selection);
                     (*it)->addExam(selection, this);
                     a_listEtudiantARepartir.erase(it);
                     place=true;
@@ -269,13 +258,7 @@ ostream& operator<<(ostream& str, const Oral& exa){
     str<<exa.a_duration<<endl;
     str<<"Pas Liste Etudiants"<<endl;
     str<<"Liste Horaires"<<endl;
-    for (auto it(exa.a_timeTable.begin()); it!=exa.a_timeTable.end(); it++) {
-        str<<"Nouveau Jour"<<endl;
-        str<<it->first<<endl;
-        str<<*(it->second);//Pas de endl car déjà a la fin de chaque nom
-    }
-    
-    
+	str<<exa.a_timeTable;
     str<<"Fin Liste Horaires"<<endl;
     str<<"Fin Examen"<<endl;
     
@@ -287,10 +270,7 @@ void Oral::afficher(ofstream& fSave){
     fSave<<"Professeur:\t"<<a_nomProf<<endl;
     fSave<<"Salle:\t\t"<<a_Room<<endl;
     fSave<<"Durée:\t\t"<<a_duration<<endl;
-    for (auto it(a_timeTable.begin()); it!=a_timeTable.end(); it++) {
-        fSave<<endl<<"\t  "<<it->first<<endl<<endl;
-        fSave<<*(it->second);//Pas de endl car déjà a la fin de chaque nom
-    }
+	a_timeTable.afficher(fSave);
 }
 Oral* Oral::copyOralWithStudentMap(map<Student*,Student*> mapStudent){
     list<Student*> newListARepartir;
@@ -299,14 +279,18 @@ Oral* Oral::copyOralWithStudentMap(map<Student*,Student*> mapStudent){
     }
     Oral* retour= new Oral(a_name, a_nomProf, a_Room,a_duration, newListARepartir);
     //on remplis la map jour par jour
-    for (auto it(a_timeTable.begin()); it!=a_timeTable.end(); it++) {
+	
+	for (auto it(a_timeTable.begin()); it!=a_timeTable.end(); it++) {
         retour->a_timeTable[it->first]=it->second->copyDayTimeTableWithMap(mapStudent);
-        retour->fixerStudent();
     }
+	
+	//	retour->a_timeTable = a_timeTable.copyWithMap(mapStudent);
+	retour->addExamToStudent();
     
     return retour;
 }
-void Oral::fixerStudent(){
+
+void Oral::addExamToStudent(){
     for (auto jour(a_timeTable.begin()); jour != a_timeTable.end(); jour++) {
         list<Student*> nonFixJour =jour->second->getNonFixe();
         for (auto it(nonFixJour.begin()); nonFixJour.end()!=it; it++) {
