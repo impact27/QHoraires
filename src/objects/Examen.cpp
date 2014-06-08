@@ -281,7 +281,7 @@ Oral* Oral::copyOralWithStudentMap(map<Student*,Student*> mapStudent){
     //on remplis la map jour par jour
 	
 	for (auto it(a_timeTable.begin()); it!=a_timeTable.end(); it++) {
-        retour->a_timeTable[it->first]=it->second->copyDayTimeTableWithMap(mapStudent);
+		retour->a_timeTable.setDayTimeTableOnDate(it->second->copyDayTimeTableWithMap(mapStudent), it->first);
     }
 	
 	//	retour->a_timeTable = a_timeTable.copyWithMap(mapStudent);

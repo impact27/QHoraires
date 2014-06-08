@@ -22,7 +22,7 @@ private:
 	
 	//Copie Pout éviter les copies
     DayTimeTable(const DayTimeTable& day){}
-	DayTimeTable& operator=(DayTimeTable* toCopy){};
+	DayTimeTable& operator=(DayTimeTable toCopy){};
 	
     //Vérifie si slot est libre
     bool slotIsFree(Time heure);
@@ -92,10 +92,11 @@ public:
 
 template <class T>
 class TimeTable : public map<Date, DayTimeTable<T>* > {
-	public:
+	
 	//No access to DayTimeTable directly
 	DayTimeTable<T>*& operator[](Date date);
-	
+	public:
+	void setDayTimeTableOnDate(DayTimeTable<T>* dtt, Date date);
 	//copy
 	void FillWithTimeTableAndMap(const TimeTable<T>& toCopy, map<T, T> map);
 	TimeTable<T> copyWithMap(map<T, T> map);

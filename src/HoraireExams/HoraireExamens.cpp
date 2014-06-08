@@ -274,7 +274,7 @@ Student* HoraireExamens::searchNewStudent(const string& nameStudent){
 		}
 		else{
 			cout<<"Le nom de EPFL ne correspond pas"<<endl;
-			free(retour);
+			delete retour;
 		}
 	}
 	return NULL;

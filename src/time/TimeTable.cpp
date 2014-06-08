@@ -18,7 +18,6 @@
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 
-
 template <class T>
 bool DayTimeTable<T>::slotIsFree(Time heure){
 	if (a_listeSlots.find(heure) == a_listeSlots.end()) {
@@ -208,6 +207,14 @@ DayTimeTable<T>*&  TimeTable<T>::operator[](Date date){
 	return map<Date, DayTimeTable<T>* >::operator[](date);
 }
 
+template <class T>
+void TimeTable<T>::setDayTimeTableOnDate(DayTimeTable<T>* dtt, Date date){
+	if (hasDate(date)){
+		delete this->map<Date, DayTimeTable<T>* >::operator[](date);
+	}
+	this->map<Date, DayTimeTable<T>* >::operator[](date)= dtt;
+}
+
 
 template <class T>
 int  TimeTable<T>::numberFreeSlots(){
@@ -257,9 +264,9 @@ unsigned long TimeTable<T>::numberOfDays(){
 
 template <class T>
 TimeTable<T>::~TimeTable(){
-//	for (auto it(this->begin()); it!=this->end(); it++) {
-//		delete it->second;PROBLEM
-//	}
+	for (auto it(this->begin()); it!=this->end(); it++) {
+		delete it->second;//TODO:PROBLEM
+	}
 }
 
 template <class T>
@@ -295,7 +302,7 @@ template <class T>
 TimeTable<T> TimeTable<T>::copyWithMap(map<T, T> map){
 	TimeTable<T> retour;
 	for (auto it(this->begin()); it!=this->end(); it++) {
-		retour[it->first]=it->second->copyDayTimeTableWithMap(map);
+		retour.setDayTimeTableOnDate(it->second->copyDayTimeTableWithMap(map),it->first);
 	}
 	return retour;
 }
