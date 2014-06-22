@@ -471,7 +471,7 @@ void HoraireExamens::enregistrer(){
 	for (auto it(a_listOral.begin()); it!=a_listOral.end(); it++) {
 		//On charge les cours
 		ofstream fSave;
-		fSave.open((*it)->name().c_str());
+		fSave.open(((*it)->name() + ".txt").c_str());
 		if (fSave.fail()) {
 			cout<<"Echec d'écriture pour examen "<<(*it)->name()<<endl;
 		}
