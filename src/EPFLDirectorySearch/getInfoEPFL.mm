@@ -29,7 +29,7 @@ Student* GetInfoEPFL(const string& StudentName){
 		//En cas de réussite
 		else{
 			NSString* premierResultat= [page1Parser getContentOfFirstBalise:@"li"];//Les resultats sont dans li
-			if (!premierResultat) {
+			if (!premierResultat|| [premierResultat isEqualToString:@"Aucun résultat trouvé"]) {
 				NSLog(@"Aucun Résultat trouvé pour le nom %@",info);
 			}
 			//si il existe

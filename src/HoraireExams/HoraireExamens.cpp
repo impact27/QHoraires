@@ -171,7 +171,11 @@ bool HoraireExamens::lireCour(ifstream& fOrals){
                 nomEtudiantActuel=(nomEtudiant.substr(0,empl));
                 nomEtudiant=nomEtudiant.substr(empl+2);
             }
-            listeEtudiants.push_back(addStudent(nomEtudiantActuel));
+			Student* etudiant = addStudent(nomEtudiantActuel);
+			if (etudiant != NULL) {
+				listeEtudiants.push_back(etudiant);
+			}
+			
             
             
         }
@@ -218,8 +222,11 @@ bool HoraireExamens::lireCour(ifstream& fOrals){
                         nameStudent = ligne.substr(6);//Le nom commence après un espace
                         etudiant = addStudent(nameStudent);
                     }
-                    //Si il y a un étudiant, on l'ajoute, sinon on Met un slot vide
-                    a_listOral.back()->addTime(day, time, etudiant);
+					if (etudiant != NULL) {
+						//Si il y a un étudiant, on l'ajoute, sinon on Met un slot vide
+						a_listOral.back()->addTime(day, time, etudiant);
+					}
+
                     
                 }
                 
