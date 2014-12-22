@@ -12,9 +12,12 @@
 
 Student* GetInfoEPFL(const string& StudentName){
 	@autoreleasepool {
-        
 		//On charge les termes de recherches séparés par des +
 		NSString* info = [[NSString alloc] initWithUTF8String:StudentName.c_str()];
+		if (info == nil){
+			NSLog(@"Impossible de lire le nom - l'encodage est il UTF8?");
+			return nullptr;
+		}
 		info = [info stringByReplacingOccurrencesOfString:@" " withString:@"+"];//Remplace les espaces avec des plus
 		
 		NSError *err = nil;
@@ -23,7 +26,7 @@ Student* GetInfoEPFL(const string& StudentName){
 		//En cas d'erreur
 		if(err)
 		{
-			NSLog(@"Impossible de charger la page");
+			NSLog(@"Impossible de charger la page: %@, %@", [err localizedDescription], [err localizedFailureReason]);
 		}
 		
 		//En cas de réussite
