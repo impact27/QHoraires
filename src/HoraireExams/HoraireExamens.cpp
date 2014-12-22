@@ -222,10 +222,8 @@ bool HoraireExamens::lireCour(ifstream& fOrals){
                         nameStudent = ligne.substr(6);//Le nom commence après un espace
                         etudiant = addStudent(nameStudent);
                     }
-					if (etudiant != NULL) {
-						//Si il y a un étudiant, on l'ajoute, sinon on Met un slot vide
-						a_listOral.back()->addTime(day, time, etudiant);
-					}
+					//Si il y a un étudiant, on l'ajoute, sinon on Met un slot vide
+					a_listOral.back()->addTime(day, time, etudiant);
 
                     
                 }
@@ -247,7 +245,7 @@ bool HoraireExamens::lireCour(ifstream& fOrals){
 		return false;
     }
     if (!a_listOral.back()->placesSuffisantes()) {
-        cout<<"Un Oral n'a pas assez de Places"<<endl;
+        cout<<"Un Oral n'a pas assez de Places"<<a_listOral.back()-> name()<<endl;
         return false;
     }
     return true;
